@@ -1,0 +1,111 @@
+﻿<#@ template language="C#" linePragmas="false" #>
+<#@ import namespace="UnityEngine" #>
+<#@ import namespace="RoRSkinBuilder" #>
+using UnityEngine;
+using System;
+using RoR2;
+
+namespace <#= info.assetInfo.uccModName #>
+{
+  public partial class <#= info.assetInfo.uccModName #>Plugin 
+  { 
+    public delegate void VoidDelegate();
+    static VoidDelegate BeforeStartDelegate;
+    static VoidDelegate AfterStartDelegate;
+    static VoidDelegate BeforeBodyCatalogDelegate;
+    static VoidDelegate AfterBodyCatalogDelegate;
+
+    partial void BeforeStart()
+    {
+      //BeforeStartDelegate += () => { Debug.Log(Instance.name + " BeforeStart"); }; //DebugLogging
+      ////////////////////////////////
+      // add functions to delegate here
+      
+<# foreach(var extension in info.extensions)
+{ #>
+      BeforeStartDelegate += _<#=extension.Name#>Extension.BeforeStart;
+<#
+} #>
+      
+      //
+      ////////////////////////////////
+      BeforeStartDelegate?.Invoke();
+    }
+
+    partial void AfterStart()
+    {
+      //AfterStartDelegate += () => { Debug.Log(Instance.name + " AfterStart"); }; //DebugLogging
+      ////////////////////////////////
+      // add functions to delegate here
+      
+<# foreach(var extension in info.extensions)
+{ #>
+      AfterStartDelegate += _<#=extension.Name#>Extension.AfterStart;
+<#
+} #>
+    
+      //
+      ////////////////////////////////
+      AfterStartDelegate?.Invoke();
+    }
+
+    static partial void BeforeBodyCatalogInit()
+    {
+      //BeforeBodyCatalogDelegate += () => { Debug.Log(Instance.name + " BeforeBodyCatalogInit"); };//DebugLogging
+      ////////////////////////////////
+      // add functions to delegate here
+      
+<# foreach(var extension in info.extensions)
+{ #>
+      BeforeBodyCatalogDelegate += _<#=extension.Name#>Extension.BeforeBodyCatalogInit;
+<#
+} #>
+      
+      //
+      ////////////////////////////////
+      BeforeBodyCatalogDelegate?.Invoke();
+    }
+
+    static partial void AfterBodyCatalogInit()
+    {
+      //AfterBodyCatalogDelegate += () => { Debug.Log(Instance.name + " AfterBodyCatalogInit"); };//DebugLogging
+      ////////////////////////////////
+      // add functions to delegate here
+      
+<# foreach(var extension in info.extensions)
+{ #>
+      AfterBodyCatalogDelegate += _<#=extension.Name#>Extension.AfterBodyCatalogInit;
+<#
+} #>
+
+      
+      //
+      ////////////////////////////////
+      AfterBodyCatalogDelegate?.Invoke();
+    }
+
+    //TODO: find a way to interate through these,it may be more efficient to loop through them rather than add each function individually
+    ///////////////////////////////////////////
+    // Implementation of Partial Skin Added Functions from Plugin
+
+<# foreach(var skin in info.modInfo.skins) { #>
+    static event EventHandler<SkinAddedArgs> <#= skin.bodyName.ToUpperCamelCase() + skin.name.ToUpperCamelCase() #>SkinAddedEvent;
+    static partial void <#= skin.bodyName.ToUpperCamelCase() + skin.name.ToUpperCamelCase() #>SkinAdded(SkinDef skinDef, GameObject bodyPrefab) { <#= skin.bodyName.ToUpperCamelCase() + skin.name.ToUpperCamelCase() #>SkinAddedEvent.Invoke(Instance, new SkinAddedArgs(skinDef, bodyPrefab)); }
+
+<# } #>
+    //Implementation of  Partial Skin Added Functions from Plugin
+    ///////////////////////////////////////////
+
+    public class SkinAddedArgs : EventArgs
+    {
+      public SkinDef skinDef { get;  }
+      public GameObject bodyPrefab { get;  }
+
+      public SkinAddedArgs(SkinDef newSkinDef, GameObject newGameObject)
+      {
+        skinDef = newSkinDef;
+        bodyPrefab = newGameObject;
+      }
+    }
+  }
+}

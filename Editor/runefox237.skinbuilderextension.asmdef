@@ -1,0 +1,15 @@
+{
+    "name": "SkinBuilderExtension",
+    "references": [
+        "GUID:420d696f3c2739f4697e78d61fd43b2e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
